@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">DFile</string>
+    <string name="error">未能成功打开文件夹</string>
+</resources>

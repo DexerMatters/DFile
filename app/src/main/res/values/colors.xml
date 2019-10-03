@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="name_text">#82ffffff</color>
+    <color name="bar">#505050</color>
+    <color name="bar_selected">#767676</color>
+    <color name="background">#747474</color>
+    <color name="shadow_start">#2f000000</color>
+    <color name="path_border">#4c4c4c</color>
+    <color name="icon_background">#5a5a5a</color>
+</resources>
