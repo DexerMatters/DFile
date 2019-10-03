@@ -73,7 +73,8 @@
             android:layout_gravity="bottom"
             android:layout_marginBottom="6dp"
             android:orientation="horizontal"
-            android:paddingStart="8dp" >
+            android:overScrollMode="ifContentScrolls"
+            android:paddingStart="8dp">
 
         </LinearLayout>
     </android.support.v7.widget.CardView>
@@ -85,11 +86,15 @@
         android:background="@color/bar"
         android:divider="@drawable/divider"
         android:dividerHeight="2.2dp"
-        android:scrollbars="none"
+        android:fadeScrollbars="true"
+        android:fastScrollAlwaysVisible="false"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollbars="vertical"
+        android:smoothScrollbar="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title" >
+        app:layout_constraintTop_toBottomOf="@+id/title">
 
     </ListView>
 

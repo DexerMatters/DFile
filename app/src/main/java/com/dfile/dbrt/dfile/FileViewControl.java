@@ -2,6 +2,7 @@ package com.dfile.dbrt.dfile;
 
 import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -19,10 +20,18 @@ import static com.dfile.dbrt.dfile.Info.*;
 public class FileViewControl {
     ListView view;
     File file;
-    public FileViewControl(ListView recyclerView,String path){
-        view=recyclerView;
+    public FileViewControl(ListView view,String path){
+        this.view=view;
         file=new File(path);
         setDirPath(path);
+    }
+    public void update(){
+        int y=view.getScrollY();
+        int x=view.getScrollX();
+        Log.d("update scroll",x+","+y);
+        view.setAdapter(new FileViewAdapter(MAIN.get(),file.getPath()));
+        view.scrollTo(x,y);
+
     }
     public void setDirPath(final String path){
         if(new File(path).listFiles()==null){
@@ -67,6 +76,7 @@ public class FileViewControl {
             @Override
             public void onAnimationEnd(Animation animation) {
                 view.startAnimation(in);
+                file=new File(path);
                 view.setAdapter(new FileViewAdapter(MAIN.get(),path));
             }
             @Override
@@ -74,12 +84,5 @@ public class FileViewControl {
         });
         view.startAnimation(out);
 
-    }
-    public File getCurrentFile(){
-        return file;
-    }
-    public void goParentPath(){
-        file=file.getParentFile();
-        setDirPath(file.getPath());
     }
 }

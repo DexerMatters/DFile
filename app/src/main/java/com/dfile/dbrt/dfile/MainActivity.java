@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 for(File f : Info.SELECTED_FILE)
                     deleteAll(f);
+                fvc.update();
+                Info.SELECTED_FILE.clear();
             }
         });
     }
