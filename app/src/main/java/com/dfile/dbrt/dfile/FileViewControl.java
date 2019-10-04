@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.lang.reflect.Array;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import static com.dfile.dbrt.dfile.Info.*;
@@ -20,32 +21,41 @@ import static com.dfile.dbrt.dfile.Info.*;
 public class FileViewControl {
     ListView view;
     File file;
+    FileViewAdapter fva;
     public FileViewControl(ListView view,String path){
         this.view=view;
         file=new File(path);
         setDirPath(path);
     }
     public void update(){
-        int y=view.getScrollY();
-        int x=view.getScrollX();
-        Log.d("update scroll",x+","+y);
-        view.setAdapter(new FileViewAdapter(MAIN.get(),file.getPath()));
-        view.scrollTo(x,y);
-
+        float p=(float)SCROLL_Y/(float)TOTAL_ITEMS;
+        Log.d("update scroll",""+p);
+        view.setAdapter(fva=new FileViewAdapter(MAIN.get(),file.getPath()));
+        view.scrollTo(0, (int) (p*(float)view.getMaxScrollAmount()));
+        Log.d("update scroll",""+(int) (p*(float)view.getMaxScrollAmount()));
     }
     public void setDirPath(final String path){
         if(new File(path).listFiles()==null){
             Toast.makeText(MAIN.get(),R.string.error,Toast.LENGTH_SHORT).show();
             return;
         }
+        TextView info=MAIN.get().info;
         LinearLayout path_layout=MAIN.get().path;
+        long total=file.getTotalSpace();
+        long used=file.getUsableSpace();
+        String pr_str=null;
+
+        if(file.canRead()) pr_str="r";
+        if(file.canWrite()) pr_str="w";
+        if(file.canWrite()&&file.canRead()) pr_str="r/w";
+
         path_layout.removeAllViews();
         final String[] names=path.split("/");
         for(int i=0;i<names.length;i++) {
             TextView tv = new TextView(MAIN.get());
             tv.setBackgroundResource(R.drawable.path_border);
             LinearLayout.LayoutParams ll=new LinearLayout.LayoutParams(-2,-2);
-            ll.setMargins(0,0,MAIN.get().dip2px(3),0);
+            ll.setMargins(0,0,MAIN.get().dip2px(1.5f),0);
             tv.setLayoutParams(ll);
             tv.setPadding(4,0,4,0);
             tv.setText(names[i].concat("/"));
@@ -76,13 +86,22 @@ public class FileViewControl {
             @Override
             public void onAnimationEnd(Animation animation) {
                 view.startAnimation(in);
-                file=new File(path);
-                view.setAdapter(new FileViewAdapter(MAIN.get(),path));
+                view.setAdapter(fva=new FileViewAdapter(MAIN.get(),path));
             }
             @Override
             public void onAnimationRepeat(Animation animation) { }
         });
         view.startAnimation(out);
-
+        file=new File(path);
+        info.setText(String.format(MAIN.get().getString(R.string.info),toReadableSpace(used),toReadableSpace(total),file.list().length,pr_str));
+        TOTAL_ITEMS=file.list().length;
+    }
+    private String toReadableSpace(long b){
+        String s=null;
+        DecimalFormat df=new DecimalFormat("#.0");
+        if(b<1024*1024) s=df.format(b/1024f)+"KB";
+        if(b>=1024*1024&&b<1024*1024*1024) s=df.format(b/1024f/1024f)+"MB";
+        if(b>=1024*1024*1024) s=df.format(b/1024f/1024f/1024f)+"GB";
+        return s;
     }
 }

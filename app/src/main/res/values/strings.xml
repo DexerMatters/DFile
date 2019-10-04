@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">DFile</string>
     <string name="error">未能成功打开文件夹</string>
+    <string name="info">空间占用:%s/%s&#160;&#160;共%d个文件/文件夹&#160;&#160;权限:%s</string>
 </resources>

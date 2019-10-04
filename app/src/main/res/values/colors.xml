@@ -7,4 +7,6 @@
     <color name="shadow_start">#2f000000</color>
     <color name="path_border">#4c4c4c</color>
     <color name="icon_background">#5a5a5a</color>
+    <color name="tool_bar">#13ffffff</color>
+    <color name="info">#323637</color>
 </resources>

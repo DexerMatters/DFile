@@ -102,6 +102,7 @@ public class FileViewAdapter extends BaseAdapter {
                         Info.SELECTED_FILE.remove(files[i]);
                         if(Info.SELECTED_FILE.size()==0) {
                             Info.MAIN.get().tool_bar.setVisibility(View.GONE);
+                            Info.MAIN.get().path.setFocusable(true);
                             willSelect=false;
                         }
                     }
@@ -118,6 +119,7 @@ public class FileViewAdapter extends BaseAdapter {
                     name_card.setCardBackgroundColor(context.getColor(R.color.bar_selected));
                     Info.SELECTED_FILE.add(files[i]);
                     Info.MAIN.get().tool_bar.setVisibility(View.VISIBLE);
+                    Info.MAIN.get().path.setFocusable(false);
                     willSelect=true;
                 }else{
                     icon_card.setCardBackgroundColor(context.getColor(R.color.icon_background));
@@ -125,6 +127,7 @@ public class FileViewAdapter extends BaseAdapter {
                     Info.SELECTED_FILE.remove(files[i]);
                     if(Info.SELECTED_FILE.size()==0) {
                         Info.MAIN.get().tool_bar.setVisibility(View.GONE);
+                        Info.MAIN.get().path.setFocusable(true);
                         willSelect = false;
                     }
                 }
