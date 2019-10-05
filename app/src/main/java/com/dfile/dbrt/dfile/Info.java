@@ -14,4 +14,5 @@ public class Info {
     public static int SCROLL_Y=0;
     public static int TOTAL_ITEMS=0;
     public static ArrayList<File> SELECTED_FILE=new ArrayList<>();
+    public static ArrayList<File> ACTUAL_SELECTED_FILE=new ArrayList<>();
 }

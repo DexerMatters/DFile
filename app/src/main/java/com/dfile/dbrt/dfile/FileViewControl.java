@@ -27,6 +27,15 @@ public class FileViewControl {
         file=new File(path);
         setDirPath(path);
     }
+    public File getCurrentFile(){
+        StringBuilder sb=new StringBuilder();
+        for(int i=0;i<MAIN.get().path.getChildCount();i++){
+            TextView t= (TextView) MAIN.get().path.getChildAt(i);
+            sb.append(t.getText()+"/");
+        }
+        sb.setLength(sb.length()-1);
+        return new File(sb.toString());
+    }
     public void update(){
         float p=(float)SCROLL_Y/(float)TOTAL_ITEMS;
         Log.d("update scroll",""+p);
@@ -60,7 +69,7 @@ public class FileViewControl {
             tv.setPadding(4,0,4,0);
             tv.setText(names[i].concat("/"));
             tv.setTextColor(MAIN.get().getResources().getColor(R.color.name_text));
-            tv.setTextSize(MAIN.get().dip2px(4));
+            tv.setTextSize(MAIN.get().dip2px(4.5f));
             final int i_ = i;
             tv.setOnClickListener(new View.OnClickListener() {
                 String[] strs=Arrays.copyOfRange(names,0, i_+1);
