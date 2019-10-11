@@ -2,4 +2,5 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <corners android:radius="2dp" />
     <solid android:color="@color/path_border" />
+    <stroke android:color="@color/path_border_border" android:width="0.5dp"/>
 </shape>

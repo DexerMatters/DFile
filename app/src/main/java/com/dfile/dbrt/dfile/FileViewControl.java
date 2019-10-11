@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -85,6 +86,13 @@ public class FileViewControl {
             });
             path_layout.addView(tv);
         }
+        final HorizontalScrollView scrollView=Info.MAIN.get().findViewById(R.id.scroll);
+        scrollView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                scrollView.smoothScrollBy(scrollView.getMaxScrollAmount(),0);
+            }
+        },10);
         Animation out=AnimationUtils.makeOutAnimation(MAIN.get(),false);
         final Animation in=AnimationUtils.makeInAnimation(MAIN.get(),false);
         out.setDuration(130);
@@ -105,7 +113,7 @@ public class FileViewControl {
         info.setText(String.format(MAIN.get().getString(R.string.info),toReadableSpace(used),toReadableSpace(total),file.list().length,pr_str));
         TOTAL_ITEMS=file.list().length;
     }
-    private String toReadableSpace(long b){
+    public static String toReadableSpace(long b){
         String s=null;
         DecimalFormat df=new DecimalFormat("#.0");
         if(b<1024*1024) s=df.format(b/1024f)+"KB";

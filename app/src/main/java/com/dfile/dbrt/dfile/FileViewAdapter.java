@@ -69,6 +69,7 @@ public class FileViewAdapter extends BaseAdapter {
         return i;
     }
     @Override
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public View getView(final int i, View view, ViewGroup viewGroup) {
         View v=LayoutInflater.from(context).inflate(R.layout.file_view_bar,null);
         v.setLayoutParams(new ListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,Info.MAIN.get().dip2px(38)));
@@ -82,8 +83,11 @@ public class FileViewAdapter extends BaseAdapter {
             file_icon.setImageResource(R.drawable.folder);
         else
             file_icon.setImageResource(R.drawable.file);
+        if(Info.SELECTED_FILE.contains(files[i])){
+            icon_card.setCardBackgroundColor(context.getColor(R.color.bar_selected));
+            name_card.setCardBackgroundColor(context.getColor(R.color.bar_selected));
+        }
         file_bar.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
                 if(!willSelect) {
@@ -106,6 +110,9 @@ public class FileViewAdapter extends BaseAdapter {
                             willSelect=false;
                         }
                     }
+                    if(Info.SELECTED_FILE.size()==1)
+                        Info.MAIN.get().button_info.setVisibility(View.VISIBLE);
+                    else Info.MAIN.get().button_info.setVisibility(View.GONE);
                 }
             }
         });
@@ -131,6 +138,9 @@ public class FileViewAdapter extends BaseAdapter {
                         willSelect = false;
                     }
                 }
+                if(Info.SELECTED_FILE.size()==1)
+                    Info.MAIN.get().button_info.setVisibility(View.VISIBLE);
+                else Info.MAIN.get().button_info.setVisibility(View.GONE);
                 return true;
             }
         });

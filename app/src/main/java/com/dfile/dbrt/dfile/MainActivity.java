@@ -14,6 +14,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -36,15 +37,23 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     public FileViewControl fvc;
     public LinearLayout path;
     public LinearLayout tool_bar;
     public TextView info;
+    public ImageButton button_delete,
+            button_copy,
+            button_cut,
+            button_info,
+            button_rename;
     private PopupWindow popupWindow,loadPopupWindow;
     private ProgressBar pb;
     private int mode=0;
+    private Thread task_solve_thr;
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         tool_bar=findViewById(R.id.tool_bar);
         info=findViewById(R.id.file_info);
         fvc=new FileViewControl(file_list, Environment.getExternalStorageDirectory().getPath());
-
         button_create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -103,22 +111,23 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("onScroll",""+i);
             }
         });
-        ImageButton button_delete=findViewById(R.id.button_delete),
-                button_copy=findViewById(R.id.button_copy),
-                button_cut=findViewById(R.id.button_cut);
+        button_delete=findViewById(R.id.button_delete);
+        button_copy=findViewById(R.id.button_copy);
+        button_cut=findViewById(R.id.button_cut);
+        button_info=findViewById(R.id.button_info);
+        button_rename=findViewById(R.id.button_rename);
         button_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pb=showLoadingPopupWindow("删除中");
                 for(File f : Info.SELECTED_FILE) {
                     total=0;
                     getFileCount(total,f);
                     deleteAll(f);
                 }
-                loadPopupWindow.dismiss();
                 fvc.update();
                 Info.SELECTED_FILE.clear();
                 tool_bar.setVisibility(View.GONE);
+
             }
         });
         button_copy.setOnClickListener(new View.OnClickListener() {
@@ -128,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
                 button_paste.setVisibility(View.VISIBLE);
                 Toast.makeText(MainActivity.this,"复制成功",Toast.LENGTH_SHORT).show();
                 tool_bar.setVisibility(View.GONE);
+                fvc.update();
             }
         });
         button_cut.setOnClickListener(new View.OnClickListener() {
@@ -137,6 +147,14 @@ public class MainActivity extends AppCompatActivity {
                 button_paste.setVisibility(View.VISIBLE);
                 Toast.makeText(MainActivity.this,"剪切成功",Toast.LENGTH_SHORT).show();
                 tool_bar.setVisibility(View.GONE);
+                fvc.update();
+            }
+        });
+        button_info.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showInfoPopupWindow(fvc.getCurrentFile());
+
             }
         });
     }
@@ -166,18 +184,18 @@ public class MainActivity extends AppCompatActivity {
     }
     int deleted=0;
     int total=0;
-    public void deleteAll(File file) {
+    public void deleteAll(final File file) {
         if(file.isFile()||file.list()==null||file.list().length==0) {
             file.delete();
             deleted=0;
-            pb.setProgress(100);
+            //pb.setProgress(100);
         }else {
             File files[] = file.listFiles();
             for(File f :files) {
                 deleted++;
                 deleteAll(f);
                 f.delete();
-                pb.setProgress((int) ((float)deleted/(float) total*100f));
+                //pb.setProgress((int) ((float)deleted/(float) total*100f));
             }
         }
         if(file.exists()) file.delete();
@@ -201,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
         popupWindow.showAtLocation(getWindow().getDecorView(), Gravity.CENTER,0,0);
         final EditText file_name_edit=content.findViewById(R.id.file_name_edit);
         TextView quit_text=content.findViewById(R.id.text_quit),
-                new_file_text=content.findViewById(R.id.text_undo),
+                new_file_text=content.findViewById(R.id.text_quit),
                 new_folder_text=content.findViewById(R.id.text_new_folder);
         quit_text.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -233,6 +251,46 @@ public class MainActivity extends AppCompatActivity {
         });
         return popupWindow;
     }
+
+    public PopupWindow showInfoPopupWindow(File file) {
+        final PopupWindow popupWindow=new PopupWindow(this);
+        View content = LayoutInflater.from(this).inflate(R.layout.dialog_info, null);
+        popupWindow.setWidth(dip2px(310));
+        popupWindow.setHeight(dip2px(300));
+        popupWindow.setFocusable(true);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        popupWindow.setOutsideTouchable(false);
+        popupWindow.setAnimationStyle(R.style.DialogAnimation);
+        popupWindow.setContentView(content);
+        popupWindow.showAtLocation(getWindow().getDecorView(), Gravity.CENTER, 0, 0);
+        TextView path=content.findViewById(R.id.text_file_path),
+                date=content.findViewById(R.id.text_file_date),
+                name=content.findViewById(R.id.text_file_name),
+                size=content.findViewById(R.id.text_file_size),
+                right=content.findViewById(R.id.text_file_right),
+                type=content.findViewById(R.id.text_file_type),
+                child_count=content.findViewById(R.id.text_file_member);
+        LinearLayout l=content.findViewById(R.id.l4);
+        TextView quit=content.findViewById(R.id.text_quit);
+        Date d=new Date(file.lastModified());
+        path.setText(file.getPath());
+        date.setText(d.getYear()+"年"+d.getMonth()+"月"+d.getDay()+"日"+d.getHours()+":"+d.getHours());
+        name.setText(file.getName());
+        size.setText(FileViewControl.toReadableSpace(file.length()));
+        right.setText(file.canWrite()?"可写":"可读");
+        type.setText(getFileTypeBySuffix(file));
+        quit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Info.SELECTED_FILE.clear();
+                fvc.update();
+                popupWindow.dismiss();
+            }
+        });
+        l.setVisibility(View.GONE);
+        return popupWindow;
+    }
+
     public ProgressBar showLoadingPopupWindow(String title_str) {
         final PopupWindow popupWindow = new PopupWindow(this);
         View content = LayoutInflater.from(this).inflate(R.layout.dialog_load, null);
@@ -246,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
         popupWindow.showAtLocation(getWindow().getDecorView(), Gravity.CENTER, 0, 0);
         TextView title=content.findViewById(R.id.title);
         title.setText(title_str);
-        TextView undo_text=content.findViewById(R.id.text_undo);
+        TextView undo_text=content.findViewById(R.id.text_quit);
         ProgressBar pb=content.findViewById(R.id.progress_bar);
         undo_text.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -257,7 +315,7 @@ public class MainActivity extends AppCompatActivity {
         loadPopupWindow=popupWindow;
         return pb;
     }
-    public static void dirCopy(String srcPath, String destPath) {
+    public void dirCopy(final String srcPath, final String destPath) {
         File src = new File(srcPath);
         if (!new File(destPath).exists()) {
             new File(destPath).mkdirs();
@@ -270,13 +328,64 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-    public static void fileCopy(String srcPath, String destPath) {
+    public String getFileSuffix(File file){
+        String name=file.getName();
+        if(name.lastIndexOf(name.lastIndexOf(".") + 1)!=-1)
+            return name.substring(name.lastIndexOf(name.lastIndexOf(".") + 1)).toLowerCase();
+        return null;
+    }
+    public String getFileTypeBySuffix(File file){
+        if(file.isDirectory()) return "文件夹";
+        if(getFileSuffix(file)==null) return "未知";
+        switch (getFileSuffix(file)){
+            case "png":
+                return "PNG图像";
+            case "jpg":
+                return "JPG图像";
+            case "gif":
+                return "GIF动画";
+            case "txt":
+                return "文本";
+            case "ppt":
+                return "演示文档";
+            case "pptx":
+                return "演示文档";
+            case "doc":
+                return "文档";
+            case "docx":
+                return "文档";
+            case "html":
+                return "网页";
+            case "htm":
+                return "网页";
+            case "zip":
+                return "ZIP压缩包";
+            case "rar":
+                return "RAR压缩包";
+            case "7z":
+                return "7Z压缩包";
+            case "apk":
+                return "安装包";
+            case "ogg":
+                return "音效";
+            case "wav":
+                return "音轨";
+            case "mp3":
+                return "音乐";
+            case "mp4":
+                return "MP4视频";
+            case "avi":
+                return "AVI视频";
+            default:
+                return getFileSuffix(file).toUpperCase()+"文件";
+        }
+    }
+    public void fileCopy(final String srcPath, final String destPath) {
         File src = new File(srcPath);
         File dest = new File(destPath);
         //使用jdk1.7 try-with-resource 释放资源，并添加了缓存流
-        try(InputStream is = new BufferedInputStream(new FileInputStream(src));
-            OutputStream out =new BufferedOutputStream(new FileOutputStream(dest))) {
+        try (InputStream is = new BufferedInputStream(new FileInputStream(src));
+             OutputStream out = new BufferedOutputStream(new FileOutputStream(dest))) {
             byte[] flush = new byte[1024];
             int len = -1;
             while ((len = is.read(flush)) != -1) {
