@@ -3,4 +3,5 @@
     <string name="error">未能成功打开文件夹</string>
     <string name="error2">未能成功创建文件/文件夹</string>
     <string name="info">空间占用:%s/%s&#160;&#160;共%d个文件/文件夹&#160;&#160;权限:%s</string>
+    <string name="tips">{n} 表示文件原名；{i} 表示文件序数；\n{y} 表示今年年份；{m} 表示本月月份；\n{d} 表示今天几日；{h} 表示当前几时；\n{min} 表示当前几分；{s} 表示当前几秒</string>
 </resources>

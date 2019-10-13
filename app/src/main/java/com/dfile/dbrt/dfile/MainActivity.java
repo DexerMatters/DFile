@@ -9,6 +9,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -40,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
+    private static int count;
     public FileViewControl fvc;
     public LinearLayout path;
     public LinearLayout tool_bar;
@@ -53,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar pb;
     private int mode=0;
     private Thread task_solve_thr;
+    private ArrayList<File> fs;
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,8 +124,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 for(File f : Info.SELECTED_FILE) {
-                    total=0;
-                    getFileCount(total,f);
                     deleteAll(f);
                 }
                 fvc.update();
@@ -153,12 +155,18 @@ public class MainActivity extends AppCompatActivity {
         button_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showInfoPopupWindow(fvc.getCurrentFile());
+                showInfoPopupWindow(Info.SELECTED_FILE.get(0));
 
             }
         });
+        button_rename.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showRenameFilePopupWindow();
+            }
+        });
     }
-    public void getFile(ArrayList<File> fs, File file){
+    public void getFile(File file){
         File[] files=file.listFiles();
         if(file.isDirectory())
             for(int i=0;i<files.length;i++){
@@ -166,23 +174,21 @@ public class MainActivity extends AppCompatActivity {
                 if(f.isFile())
                     fs.add(f);
                 else
-                    getFile(fs,f);
+                    getFile(f);
             }
         else fs.add(file);
     }
-    public void getFileCount(int count,File file){
-        File[] files=file.listFiles();
-        if(file.isDirectory())
-            for(int i=0;i<files.length;i++){
-                File f=files[i];
-                if(f.isFile())
-                    count++;
-                else
-                    getFileCount(count,f);
-            }
-        else count=1;
+    public static void getFileCount(String filepath) {
+        File file = new File(filepath);
+        File[] listfile = file.listFiles();
+        for (int i = 0; i < listfile.length; i++) {
+            if (!listfile[i].isDirectory())
+                count++;
+            else
+                getFileCount(listfile[i].toString());
+        }
     }
-    int deleted=0;
+        int deleted=0;
     int total=0;
     public void deleteAll(final File file) {
         if(file.isFile()||file.list()==null||file.list().length==0) {
@@ -219,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
         popupWindow.showAtLocation(getWindow().getDecorView(), Gravity.CENTER,0,0);
         final EditText file_name_edit=content.findViewById(R.id.file_name_edit);
         TextView quit_text=content.findViewById(R.id.text_quit),
-                new_file_text=content.findViewById(R.id.text_quit),
+                new_file_text=content.findViewById(R.id.text_new_file),
                 new_folder_text=content.findViewById(R.id.text_new_folder);
         quit_text.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -251,8 +257,58 @@ public class MainActivity extends AppCompatActivity {
         });
         return popupWindow;
     }
-
-    public PopupWindow showInfoPopupWindow(File file) {
+    public PopupWindow showRenameFilePopupWindow(){
+        final PopupWindow popupWindow=new PopupWindow(this);
+        View content= LayoutInflater.from(this).inflate(R.layout.dialog_rename,null);
+        popupWindow.setWidth(dip2px(310));
+        popupWindow.setHeight(dip2px(240));
+        popupWindow.setFocusable(true);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        popupWindow.setOutsideTouchable(false);
+        popupWindow.setAnimationStyle(R.style.DialogAnimation);
+        popupWindow.setContentView(content);
+        popupWindow.showAtLocation(getWindow().getDecorView(), Gravity.CENTER,0,0);
+        final EditText file_name_edit=content.findViewById(R.id.file_name_edit);
+        TextView quit_text=content.findViewById(R.id.text_quit),
+                ok_text=content.findViewById(R.id.text_ok);
+        if(Info.SELECTED_FILE.size()==1) file_name_edit.setText(Info.SELECTED_FILE.get(0).getName());
+        quit_text.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                popupWindow.dismiss();
+            }
+        });
+        ok_text.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int i=0;
+                for(File f : Info.SELECTED_FILE){
+                    String name=file_name_edit.getText().toString();
+                    Date date=new Date();
+                    String[][] seek={
+                            {"\\{n\\}",f.getName()},
+                            {"\\{i\\}",""+i},
+                            {"\\{y\\}",""+date.getYear()},
+                            {"\\{m\\}",""+date.getMonth()},
+                            {"\\{d\\}",""+date.getDay()},
+                            {"\\{h\\}",""+date.getHours()},
+                            {"\\{min\\}",""+date.getMinutes()},
+                            {"\\{s\\}",""+date.getSeconds()}
+                    };
+                    for(String[] val : seek){
+                        name=name.replaceAll(val[0],val[1]);
+                    }
+                    f.renameTo(new File(f.getParent()+"/"+name));
+                    i++;
+                }
+                Info.SELECTED_FILE=new ArrayList<>();
+                fvc.update();
+                popupWindow.dismiss();
+            }
+        });
+        return popupWindow;
+    }
+    public PopupWindow showInfoPopupWindow(final File file) {
         final PopupWindow popupWindow=new PopupWindow(this);
         View content = LayoutInflater.from(this).inflate(R.layout.dialog_info, null);
         popupWindow.setWidth(dip2px(310));
@@ -263,31 +319,69 @@ public class MainActivity extends AppCompatActivity {
         popupWindow.setAnimationStyle(R.style.DialogAnimation);
         popupWindow.setContentView(content);
         popupWindow.showAtLocation(getWindow().getDecorView(), Gravity.CENTER, 0, 0);
-        TextView path=content.findViewById(R.id.text_file_path),
+        final TextView path=content.findViewById(R.id.text_file_path),
                 date=content.findViewById(R.id.text_file_date),
                 name=content.findViewById(R.id.text_file_name),
                 size=content.findViewById(R.id.text_file_size),
+                used_space=content.findViewById(R.id.text_file_usedspace),
                 right=content.findViewById(R.id.text_file_right),
                 type=content.findViewById(R.id.text_file_type),
                 child_count=content.findViewById(R.id.text_file_member);
         LinearLayout l=content.findViewById(R.id.l4);
         TextView quit=content.findViewById(R.id.text_quit);
         Date d=new Date(file.lastModified());
-        path.setText(file.getPath());
+        path.setText(FileViewControl.shortenString(file.getPath(),13));
         date.setText(d.getYear()+"年"+d.getMonth()+"月"+d.getDay()+"日"+d.getHours()+":"+d.getHours());
-        name.setText(file.getName());
-        size.setText(FileViewControl.toReadableSpace(file.length()));
+        name.setText(FileViewControl.shortenString(file.getName(),13));
         right.setText(file.canWrite()?"可写":"可读");
         type.setText(getFileTypeBySuffix(file));
         quit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Info.SELECTED_FILE.clear();
-                fvc.update();
                 popupWindow.dismiss();
             }
         });
-        l.setVisibility(View.GONE);
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                Info.SELECTED_FILE.clear();
+                fvc.update();
+                tool_bar.setVisibility(View.GONE);
+            }
+        });
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                long s=0;
+                long s_=file.getTotalSpace()-file.getFreeSpace();
+                fs = new ArrayList<>();
+                getFile(file);
+                for(File f:fs){
+                    if(!f.isDirectory()){
+                        s+=f.length();
+                    }
+                }
+
+                if(s==0) size.setText("0");
+                else size.setText(FileViewControl.toReadableSpace(s));
+                if(s_==0) used_space.setText("0");
+                else used_space.setText(FileViewControl.toReadableSpace(s_));
+            }
+        }).start();
+        size.setText(FileViewControl.toReadableSpace(file.length()));
+        if(file.isDirectory()){
+            l.setVisibility(View.VISIBLE);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    getFileCount(file.getPath());
+                    child_count.setText(count+"个");
+                    count=0;
+                }
+            }).start();
+            l.setVisibility(View.VISIBLE);
+        }else
+            l.setVisibility(View.GONE);
         return popupWindow;
     }
 
@@ -328,13 +422,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    public String getFileSuffix(File file){
+    public static String getFileSuffix(File file){
         String name=file.getName();
-        if(name.lastIndexOf(name.lastIndexOf(".") + 1)!=-1)
-            return name.substring(name.lastIndexOf(name.lastIndexOf(".") + 1)).toLowerCase();
+        if(name.lastIndexOf(".")!=-1)
+            return name.substring(name.lastIndexOf(".") + 1).toLowerCase();
+        Log.d("file_suffix",name.substring(name.lastIndexOf(".") + 1).toLowerCase());
         return null;
     }
-    public String getFileTypeBySuffix(File file){
+    public static String getFileTypeBySuffix(File file){
+
         if(file.isDirectory()) return "文件夹";
         if(getFileSuffix(file)==null) return "未知";
         switch (getFileSuffix(file)){

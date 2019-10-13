@@ -21,6 +21,7 @@ import org.w3c.dom.Text;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Objects;
 
 public class FileViewAdapter extends BaseAdapter {
     private File[] files;
@@ -81,8 +82,85 @@ public class FileViewAdapter extends BaseAdapter {
         file_name.setText(files[i].getName());
         if(files[i].isDirectory())
             file_icon.setImageResource(R.drawable.folder);
-        else
-            file_icon.setImageResource(R.drawable.file);
+        else {
+            int     image=R.drawable.image,
+                    text=R.drawable.file_text,
+                    video=R.drawable.video,
+                    music=R.drawable.music,
+                    compress=R.drawable.zip,
+                    script=R.drawable.script,
+                    apk=R.drawable.pack;
+            int r;
+            if(files[i].getName().lastIndexOf(".")!=-1) {
+                switch (files[i].getName().substring(files[i].getName().lastIndexOf(".")+1).toLowerCase()) {
+                    case "png":
+                        r = image;break;
+                    case "jpg":
+                        r = image;break;
+                    case "jpeg":
+                        r = image;break;
+                    case "gif":
+                        r = image;break;
+                    case "icon":
+                        r = image;break;
+                    case "txt":
+                        r = text;break;
+                    case "word":
+                        r = text;break;
+                    case "md":
+                        r = text;break;
+                    case "css":
+                        r = text;break;
+                    case "json":
+                        r = text;break;
+                    case "htm":
+                        r = text;break;
+                    case "html":
+                        r = text;break;
+                    case "xml":
+                        r = text;break;
+                    case "iml":
+                        r = text;break;
+                    case "js":
+                        r = script;break;
+                    case "php":
+                        r = script;break;
+                    case "vue":
+                        r = script;break;
+                    case "c":
+                        r = script;break;
+                    case "java":
+                        r = script;break;
+                    case "cpp":
+                        r = script;break;
+                    case "zip":
+                        r = compress;break;
+                    case "rar":
+                        r = compress;break;
+                    case "7z":
+                        r = compress;break;
+                    case "tar":
+                        r = compress;break;
+                    case "jar":
+                        r = compress;break;
+                    case "ogg":
+                        r = music;break;
+                    case "mp3":
+                        r = music;break;
+                    case "wav":
+                        r = music;break;
+                    case "mp4":
+                        r = video;break;
+                    case "avi":
+                        r = video;break;
+                    case "apk":
+                        r = apk;break;
+                    default:
+                        r = R.drawable.file;break;
+                }
+            }else r=R.drawable.file;
+            file_icon.setImageResource(r);
+        }
         if(Info.SELECTED_FILE.contains(files[i])){
             icon_card.setCardBackgroundColor(context.getColor(R.color.bar_selected));
             name_card.setCardBackgroundColor(context.getColor(R.color.bar_selected));

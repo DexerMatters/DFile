@@ -101,7 +101,7 @@
             android:orientation="horizontal"
             android:paddingRight="10dp"
             android:paddingTop="10dp"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <ImageButton
                 android:id="@+id/button_rename"

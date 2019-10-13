@@ -86,7 +86,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:overScrollMode="ifContentScrolls"
+                    android:overScrollMode="always"
+                    android:scrollbars="none"
                     android:textColor="@color/button_text_color" />
             </LinearLayout>
 
@@ -112,6 +113,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:overScrollMode="always"
+                    android:scrollbars="none"
                     android:textColor="@color/button_text_color" />
             </LinearLayout>
 
@@ -137,6 +140,33 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:text="计算中..."
+                    android:textColor="@color/button_text_color" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/l1_"
+                android:layout_width="230dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/l1">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.5"
+                    android:text="占用空间"
+                    android:textColor="@color/name_text" />
+
+                <TextView
+                    android:id="@+id/text_file_usedspace"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="计算中..."
                     android:textColor="@color/button_text_color" />
             </LinearLayout>
 
@@ -148,7 +178,7 @@
                 android:orientation="horizontal"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/l1">
+                app:layout_constraintTop_toBottomOf="@+id/l1_">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -204,7 +234,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1.5"
-                    android:text="子文件数量"
+                    android:text="子目录数量"
                     android:textColor="@color/name_text" />
 
                 <TextView
@@ -212,6 +242,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:text="计算中..."
                     android:textColor="@color/button_text_color" />
             </LinearLayout>
 

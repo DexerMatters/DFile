@@ -1,6 +1,7 @@
 package com.dfile.dbrt.dfile;
 
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -38,11 +39,15 @@ public class FileViewControl {
         return new File(sb.toString());
     }
     public void update(){
-        float p=(float)SCROLL_Y/(float)TOTAL_ITEMS;
-        Log.d("update scroll",""+p);
-        view.setAdapter(fva=new FileViewAdapter(MAIN.get(),file.getPath()));
-        view.scrollTo(0, (int) (p*(float)view.getMaxScrollAmount()));
-        Log.d("update scroll",""+(int) (p*(float)view.getMaxScrollAmount()));
+        view.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                int y=view.getScrollY();
+                Log.d("scroll_x",""+y);
+                view.setAdapter(fva=new FileViewAdapter(MAIN.get(),file.getPath()));
+                view.scrollTo(0,y);
+            }
+        },10);
     }
     public void setDirPath(final String path){
         if(new File(path).listFiles()==null){
@@ -116,9 +121,15 @@ public class FileViewControl {
     public static String toReadableSpace(long b){
         String s=null;
         DecimalFormat df=new DecimalFormat("#.0");
-        if(b<1024*1024) s=df.format(b/1024f)+"KB";
-        if(b>=1024*1024&&b<1024*1024*1024) s=df.format(b/1024f/1024f)+"MB";
-        if(b>=1024*1024*1024) s=df.format(b/1024f/1024f/1024f)+"GB";
+        if(b<1024) s=b+(b==1?" Byte":" Bytes");
+        if(b>=1024&&b<1024*1024) s=df.format(b/1024f)+" KB";
+        if(b>=1024*1024&&b<1024*1024*1024) s=df.format(b/1024f/1024f)+" MB";
+        if(b>=1024*1024*1024) s=df.format(b/1024f/1024f/1024f)+" GB";
         return s;
     }
+    public static String shortenString(String str,int max){
+        if(str.length()>max)
+            return "..."+str.substring(str.length()-max-3);
+        return str;
+    };
 }
