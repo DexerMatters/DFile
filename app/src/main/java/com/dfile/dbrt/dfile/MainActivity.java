@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("onScroll",""+i);
             }
         });
+
         button_delete=findViewById(R.id.button_delete);
         button_copy=findViewById(R.id.button_copy);
         button_cut=findViewById(R.id.button_cut);

@@ -1,5 +1,6 @@
 package com.dfile.dbrt.dfile;
 
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ListView;
@@ -15,4 +16,5 @@ public class Info {
     public static int TOTAL_ITEMS=0;
     public static ArrayList<File> SELECTED_FILE=new ArrayList<>();
     public static ArrayList<File> ACTUAL_SELECTED_FILE=new ArrayList<>();
+    public static Bitmap IMAGE;
 }

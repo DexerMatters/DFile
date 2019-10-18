@@ -2,8 +2,15 @@ package com.dfile.dbrt.dfile;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.SupportActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,6 +26,7 @@ import android.widget.TextView;
 import org.w3c.dom.Text;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
@@ -171,6 +179,25 @@ public class FileViewAdapter extends BaseAdapter {
                 if(!willSelect) {
                     if (files[i].isDirectory())
                         Info.MAIN.get().fvc.setDirPath(getCurrentDir().getPath() + '/' + files[i].getName());
+                    else{
+                        switch (files[i].getName().substring(files[i].getName().lastIndexOf(".")+1).toLowerCase()) {
+                            case "png":
+                                startImageViewingActivity(files[i]);
+                                break;
+                            case "jpg":
+                                startImageViewingActivity(files[i]);
+                                break;
+                            case "jpeg":
+                                startImageViewingActivity(files[i]);
+                                break;
+                            case "gif":
+                                startImageViewingActivity(files[i]);
+                                break;
+                            case "icon":
+                                startImageViewingActivity(files[i]);
+                                break;
+                        }
+                    }
                 }else{
                     if(Info.SELECTED_FILE.indexOf(files[i])==-1) {
                         Log.d("long",files[i].getPath());
@@ -223,6 +250,15 @@ public class FileViewAdapter extends BaseAdapter {
             }
         });
         return v;
+    }
+    public void startImageViewingActivity(File file){
+        Bitmap bitmap=BitmapFactory.decodeFile(file.getPath());
+        Intent i=new Intent();
+        i.setClass(Info.MAIN.get(),ImageActivity.class);
+        Info.MAIN.get().startActivity(i);
+        Info.IMAGE=bitmap;
+
+
     }
 
 }
