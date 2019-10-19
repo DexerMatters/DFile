@@ -180,7 +180,7 @@ public class FileViewAdapter extends BaseAdapter {
                     if (files[i].isDirectory())
                         Info.MAIN.get().fvc.setDirPath(getCurrentDir().getPath() + '/' + files[i].getName());
                     else{
-                        switch (files[i].getName().substring(files[i].getName().lastIndexOf(".")+1).toLowerCase()) {
+                        /*switch (files[i].getName().substring(files[i].getName().lastIndexOf(".")+1).toLowerCase()) {
                             case "png":
                                 startImageViewingActivity(files[i]);
                                 break;
@@ -196,7 +196,8 @@ public class FileViewAdapter extends BaseAdapter {
                             case "icon":
                                 startImageViewingActivity(files[i]);
                                 break;
-                        }
+                        }*/
+                        OpenFileUtil.getInstance().openFile(Info.MAIN.get(),files[i]);
                     }
                 }else{
                     if(Info.SELECTED_FILE.indexOf(files[i])==-1) {

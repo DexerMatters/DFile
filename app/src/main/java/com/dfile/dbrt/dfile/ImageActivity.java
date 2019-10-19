@@ -51,16 +51,20 @@ public class ImageActivity extends AppCompatActivity {
         if(event.getPointerCount()==2) {
             if (event.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN) {
                 diff = new float[]{-event.getX(1) + image.getX(), -event.getY(1) + image.getY()};
-                dis = getDistanceFrom(event.getX(0), event.getX(1), event.getY(0), event.getY(1));
+                if(image.getScaleX()>=1) {
+                    dis = getDistanceFrom(event.getX(0), event.getX(1), event.getY(0), event.getY(1));
+                }
                 Log.d("scales",""+dis);
             }
             if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
                 image.setX(diff[0] + event.getX(1));
                 image.setY(diff[1] + event.getY(1));
-                float dis_now=getDistanceFrom(event.getX(0), event.getX(1), event.getY(0), event.getY(1));
-                image.setScaleX(dis_now/dis);
-                image.setScaleY(dis_now/dis);
-                Log.d("scale",""+dis_now+","+dis);
+                if(image.getScaleX()>=1f) {
+                    float dis_now=getDistanceFrom(event.getX(0), event.getX(1), event.getY(0), event.getY(1));
+                    image.setScaleX(image.getScaleX()*(dis_now - dis));
+                    image.setScaleY(image.getScaleY()*(dis_now - dis));
+                    Log.d("scale",""+dis_now+","+dis+"->"+image.getScaleX());
+                }
             }
         }
         return super.onTouchEvent(event);
